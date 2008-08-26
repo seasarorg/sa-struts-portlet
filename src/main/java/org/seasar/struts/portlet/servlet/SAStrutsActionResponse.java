@@ -22,6 +22,7 @@ import java.util.Map;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
+import javax.portlet.PortletContext;
 import javax.portlet.PortletMode;
 import javax.portlet.PortletModeException;
 import javax.portlet.WindowState;
@@ -29,6 +30,8 @@ import javax.portlet.WindowStateException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+
+import org.seasar.struts.portlet.util.PortletUtil;
 
 /**
  * @author shinsuke
@@ -40,10 +43,13 @@ public class SAStrutsActionResponse implements HttpServletResponse,
 
     private ActionResponse actionResponse;
 
+    private PortletContext portletContext;
+
     public SAStrutsActionResponse(ActionRequest actionRequest,
-            ActionResponse actionResponse) {
+            ActionResponse actionResponse, PortletContext portletContext) {
         this.actionRequest = actionRequest;
         this.actionResponse = actionResponse;
+        this.portletContext = portletContext;
     }
 
     public void addProperty(String arg0, String arg1) {
@@ -123,13 +129,16 @@ public class SAStrutsActionResponse implements HttpServletResponse,
     }
 
     public void sendError(int i, String s) throws IOException {
-        // TODO Auto-generated method stub
-
+        portletContext.log("HTTP Status " + i + " - " + s);
+        actionRequest
+                .setAttribute(PortletUtil.ERROR_STATUS, Integer.valueOf(i));
+        actionRequest.setAttribute(PortletUtil.ERROR_MESSAGE, s);
     }
 
     public void sendError(int i) throws IOException {
-        // TODO Auto-generated method stub
-
+        portletContext.log("HTTP Status " + i);
+        actionRequest
+                .setAttribute(PortletUtil.ERROR_STATUS, Integer.valueOf(i));
     }
 
     public void setDateHeader(String s, long l) {

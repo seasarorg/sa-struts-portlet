@@ -241,15 +241,27 @@ public class SAStrutsPortlet extends GenericPortlet {
         SAStrutsActionRequest saStrutsActionRequest = new SAStrutsActionRequest(
                 request, saStrutsConfig, processActionConfig);
         SAStrutsActionResponse saActionResponse = new SAStrutsActionResponse(
-                request, response);
+                request, response, getPortletContext());
 
         // execute
         process(saStrutsActionRequest, saActionResponse);
 
+        // foward path
         String forwardPath = (String) request
                 .getAttribute(PortletUtil.FORWARD_PATH);
         if (forwardPath != null) {
             processActionConfig.setForwardPath(forwardPath);
+        }
+
+        // error status
+        if (request.getAttribute(PortletUtil.ERROR_STATUS) != null) {
+            processActionConfig.getAttributeMap().put(PortletUtil.ERROR_STATUS,
+                    request.getAttribute(PortletUtil.ERROR_STATUS));
+            Object msg = request.getAttribute(PortletUtil.ERROR_MESSAGE);
+            if (msg != null) {
+                processActionConfig.getAttributeMap().put(
+                        PortletUtil.ERROR_MESSAGE, msg);
+            }
         }
 
         // set processActionConfig
@@ -283,6 +295,16 @@ public class SAStrutsPortlet extends GenericPortlet {
         request.setAttribute(PortletUtil.PROCESS_ACTION_CONFIG,
                 processActionConfig);
 
+        // check error from processAction
+        Integer sc = (Integer) processActionConfig.getAttributeMap().get(
+                PortletUtil.ERROR_STATUS);
+        if (sc != null) {
+            response.setContentType("text/html");
+            sendError(response, sc, (String) processActionConfig
+                    .getAttributeMap().get(PortletUtil.ERROR_MESSAGE));
+            return;
+        }
+
         String requestPath = getRequestPath(request); // without contextPath
 
         PortletRequestDispatcher portletRequestDispatcher = getPortletContext()
@@ -298,14 +320,32 @@ public class SAStrutsPortlet extends GenericPortlet {
         }
         response.setContentType(cType);
 
-        response.getWriter().print(
-                request.getAttribute(PortletUtil.PORTLET_CONTENT));
-        response.flushBuffer();
+        sc = (Integer) request.getAttribute(PortletUtil.ERROR_STATUS);
+        if (sc != null) {
+            sendError(response, sc, (String) request
+                    .getAttribute(PortletUtil.ERROR_MESSAGE));
+        } else {
+            response.getWriter().print(
+                    request.getAttribute(PortletUtil.PORTLET_CONTENT));
+            response.flushBuffer();
+        }
 
         // update processActionConfig
         putProcessActionConfig(request, PortletUtil.getAccessId(request),
                 processActionConfig);
         PortletUtil.incrementAccessId(request);
+    }
+
+    protected void sendError(RenderResponse response, Integer sc, String msg)
+            throws IOException {
+        StringBuilder sb = new StringBuilder("HTTP Status ");
+        sb.append(sc);
+        if (msg != null) {
+            sb.append(" - ");
+            sb.append(msg);
+        }
+        response.getWriter().print(sb.toString());
+        response.flushBuffer();
     }
 
     protected ProcessActionConfig createProcessActionConfig(

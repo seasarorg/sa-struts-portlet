@@ -21,6 +21,7 @@ import java.io.UnsupportedEncodingException;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -45,6 +46,8 @@ public class PortletRequestFilter implements Filter {
 
     protected boolean contentOnly;
 
+    protected ServletContext servletContext;
+
     /*
      * (non-Javadoc)
      * 
@@ -57,6 +60,7 @@ public class PortletRequestFilter implements Filter {
         } else {
             contentOnly = true;
         }
+        servletContext = config.getServletContext();
     }
 
     /*
@@ -87,7 +91,7 @@ public class PortletRequestFilter implements Filter {
                 SAStrutsRenderRequest saStrutsRequest = new SAStrutsRenderRequest(
                         httpServletRequest, processActionConfig);
                 SAStrutsRenderResponse saStrutsResponse = new SAStrutsRenderResponse(
-                        httpServletResponse);
+                        httpServletRequest, httpServletResponse, servletContext);
                 // chain
                 chain.doFilter(saStrutsRequest, saStrutsResponse);
                 // set content

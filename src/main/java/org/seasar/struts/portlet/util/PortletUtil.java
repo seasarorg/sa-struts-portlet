@@ -65,6 +65,10 @@ public class PortletUtil {
 
     public static final String REDIRECT = "org.seasar.struts.portlet.redirect";
 
+    public static final String ERROR_STATUS = "org.seasar.struts.portlet.error_status";
+
+    public static final String ERROR_MESSAGE = "org.seasar.struts.portlet.error_message";
+
     private PortletUtil() {
     }
 

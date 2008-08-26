@@ -18,9 +18,13 @@ package org.seasar.struts.portlet.servlet;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
+
+import org.seasar.struts.portlet.util.PortletUtil;
 
 /**
  * @author shinsuke
@@ -34,9 +38,16 @@ public class SAStrutsRenderResponse extends HttpServletResponseWrapper
 
     private PrintWriter printWriter;
 
-    public SAStrutsRenderResponse(HttpServletResponse response) {
+    private HttpServletRequest request;
+
+    private ServletContext servletContext;
+
+    public SAStrutsRenderResponse(HttpServletRequest request,
+            HttpServletResponse response, ServletContext servletContext) {
         super(response);
         tos = new TemporaryOutputStream(DEFAULT_STREAM_SIZE);
+        this.request = request;
+        this.servletContext = servletContext;
     }
 
     public TemporaryOutputStream getTemporaryOutputStream() {
@@ -95,7 +106,17 @@ public class SAStrutsRenderResponse extends HttpServletResponseWrapper
 
     @Override
     public void sendError(int sc) throws IOException {
-        // TODO
         super.sendError(sc);
+        servletContext.log("HTTP Status " + sc);
+        request.setAttribute(PortletUtil.ERROR_STATUS, Integer.valueOf(sc));
     }
+
+    @Override
+    public void sendError(int sc, String msg) throws IOException {
+        super.sendError(sc, msg);
+        servletContext.log("HTTP Status " + sc + " - " + msg);
+        request.setAttribute(PortletUtil.ERROR_STATUS, Integer.valueOf(sc));
+        request.setAttribute(PortletUtil.ERROR_MESSAGE, msg);
+    }
+
 }
