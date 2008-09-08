@@ -127,33 +127,18 @@ public class SAStrutsPortlet extends GenericPortlet {
     }
 
     protected ActionServlet createActionServlet() throws PortletException {
-        ActionServlet actionServlet;
-        // action servlet
-        String className = getPortletConfig().getInitParameter("actionClass");
-        if (className == null) {
-            className = "org.apache.struts.action.ActionServlet";
-        }
-        Class actionClass;
-        try {
-            actionClass = Class.forName(className);
-            actionServlet = (ActionServlet) actionClass.newInstance();
-        } catch (ClassNotFoundException e) {
-            throw new PortletException("Could not load " + className, e);
-        } catch (InstantiationException e) {
-            throw new PortletException("Could not create " + className, e);
-        } catch (IllegalAccessException e) {
-            throw new PortletException("Could not create " + className, e);
-        }
-        try {
-            actionServlet.init(saStrutsConfig);
-        } catch (ServletException e) {
-            throw new PortletException("Could not initialize " + className, e);
+        ActionServlet actionServlet = (ActionServlet) getPortletContext()
+                .getAttribute(PortletUtil.ACTION_SERVLET);
+        if (actionServlet == null) {
+            throw new PortletException("ActionServlet is null.");
         }
         return actionServlet;
     }
 
     @Override
     public void destroy() {
+        saStrutsConfig = null;
+        saStrutsFilterChain = null;
     }
 
     protected String getViewPage() {
@@ -234,7 +219,7 @@ public class SAStrutsPortlet extends GenericPortlet {
 
         ProcessActionConfig processActionConfig = new ProcessActionConfig(
                 requestPath, request.getContextPath(), encoding);
-        // TODO multipart
+
         Map parameterMap = new HashMap();
         parameterMap.putAll(request.getParameterMap());
         processActionConfig.setParameterMap(parameterMap);
@@ -351,8 +336,6 @@ public class SAStrutsPortlet extends GenericPortlet {
     protected ProcessActionConfig createProcessActionConfig(
             RenderRequest request, Integer accessId, String requestUrl,
             String contextPath) {
-        PortletSession portletSession = request.getPortletSession();
-
         ProcessActionConfig processActionConfig = getProcessActionConfig(
                 request, accessId);
         if (processActionConfig != null

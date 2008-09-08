@@ -69,6 +69,8 @@ public class PortletUtil {
 
     public static final String ERROR_MESSAGE = "org.seasar.struts.portlet.error_message";
 
+    public static final String ACTION_SERVLET = "org.seasar.struts.portlet.action_servlet";
+
     private PortletUtil() {
     }
 

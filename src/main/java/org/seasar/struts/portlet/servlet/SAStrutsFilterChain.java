@@ -33,7 +33,7 @@ public class SAStrutsFilterChain implements FilterChain {
 
     private Servlet servlet;
 
-    private ThreadLocal filterPosition = new ThreadLocal();
+    private ThreadLocal<Integer> filterPosition = new ThreadLocal<Integer>();
 
     private Filter[] filters = new Filter[0];
 
@@ -66,11 +66,11 @@ public class SAStrutsFilterChain implements FilterChain {
         int pos = ((Integer) filterPosition.get()).intValue();
         if (pos < n) {
             Filter filter = filters[pos++];
-            filterPosition.set(new Integer(pos));
+            filterPosition.set(Integer.valueOf(pos));
 
             filter.doFilter(request, response, this);
 
-            filterPosition.set(new Integer(--pos));
+            filterPosition.set(Integer.valueOf(--pos));
             return;
         }
 
@@ -80,7 +80,7 @@ public class SAStrutsFilterChain implements FilterChain {
     }
 
     public void reset() {
-        filterPosition.set(new Integer(0));
+        filterPosition.set(Integer.valueOf(0));
     }
 
 }
