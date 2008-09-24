@@ -17,6 +17,7 @@ package org.seasar.struts.portlet.filter;
 
 import java.io.IOException;
 
+import javax.portlet.PortletRequest;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -41,9 +42,11 @@ public class PortletRoutingFilter extends RoutingFilter {
     public void doFilter(ServletRequest request, ServletResponse response,
             FilterChain chain) throws IOException, ServletException {
         if (PortletUtil.isPortletRequest(request)) {
+            PortletRequest portletRequest = PortletUtil
+                    .getPortletRequest(request);
             if (PortletUtil.isSAStrutsStarted(request)
-                    && request.getAttribute(DONE) == null) {
-                request.setAttribute(DONE, Boolean.TRUE);
+                    && portletRequest.getAttribute(DONE) == null) {
+                portletRequest.setAttribute(DONE, Boolean.TRUE);
                 super.doFilter(request, response, chain);
                 if (PortletUtil.isActionRequest(request)) {
                     chain.doFilter(request, response);

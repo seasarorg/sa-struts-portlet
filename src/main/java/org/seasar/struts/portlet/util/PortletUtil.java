@@ -94,6 +94,14 @@ public class PortletUtil {
         return false;
     }
 
+    public static PortletRequest getPortletRequest(ServletRequest request) {
+        Object req = request.getAttribute(PORTLET_REQUEST);
+        if (req instanceof PortletRequest) {
+            return (PortletRequest) req;
+        }
+        return null;
+    }
+
     public static ActionRequest getActionRequest(ServletRequest request) {
         Object req = request.getAttribute(PORTLET_REQUEST);
         if (req instanceof ActionRequest) {
@@ -111,7 +119,11 @@ public class PortletUtil {
     }
 
     public static boolean isSAStrutsStarted(ServletRequest request) {
-        return request.getAttribute(SASTRUTS_STARTED) != null;
+        PortletRequest portletRequest = getPortletRequest(request);
+        if (portletRequest != null) {
+            return portletRequest.getAttribute(SASTRUTS_STARTED) != null;
+        }
+        return false;
     }
 
     public static void setSAStrutsStarted(PortletRequest request) {

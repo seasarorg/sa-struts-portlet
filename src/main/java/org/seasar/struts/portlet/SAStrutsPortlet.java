@@ -77,6 +77,8 @@ public class SAStrutsPortlet extends GenericPortlet {
 
     protected static final String ENCODING = "encoding";
 
+    protected static final String PREVIOUS_PORTLET_MODE = "previousPortletMode";
+
     protected String defaultViewPage;
 
     protected String defaultEditPage;
@@ -210,8 +212,6 @@ public class SAStrutsPortlet extends GenericPortlet {
             // use cache
             return;
         }
-
-        PortletSession portletSession = request.getPortletSession();
 
         request.setAttribute(PortletUtil.PORTLET_REQUEST, request);
         request.setAttribute(PortletUtil.PORTLET_RESPONSE, response);
@@ -395,6 +395,20 @@ public class SAStrutsPortlet extends GenericPortlet {
     protected ProcessActionConfig getProcessActionConfig(
             PortletRequest request, Integer accessId) {
         PortletSession portletSession = request.getPortletSession();
+        String currentPortletMode = request.getPortletMode().toString();
+        String previousPortletMode = (String) portletSession
+                .getAttribute(PREVIOUS_PORTLET_MODE);
+
+        // set portlet mode
+        portletSession.setAttribute(PREVIOUS_PORTLET_MODE, currentPortletMode);
+
+        if (isPortletModeChange(currentPortletMode, previousPortletMode)) {
+            // portlet mode was changed. clear cache.
+            portletSession.setAttribute(PortletUtil.PROCESS_ACTION_CONFIG_MAP,
+                    new LRUMap(maxCacheSize));
+            return null;
+        }
+
         Map configMap = (Map) portletSession
                 .getAttribute(PortletUtil.PROCESS_ACTION_CONFIG_MAP);
         if (configMap == null) {
@@ -417,4 +431,13 @@ public class SAStrutsPortlet extends GenericPortlet {
         return accessId;
     }
 
+    private boolean isPortletModeChange(String currentMode, String previousMode) {
+        if (previousMode == null) {
+            return false;
+        } else if (!previousMode.equals(currentMode)) {
+            return true;
+        }
+        return false;
+
+    }
 }

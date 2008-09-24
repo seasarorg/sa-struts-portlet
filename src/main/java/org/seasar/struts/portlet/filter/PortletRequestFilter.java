@@ -16,8 +16,8 @@
 package org.seasar.struts.portlet.filter;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
+import javax.portlet.PortletRequest;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -80,26 +80,29 @@ public class PortletRequestFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response,
             FilterChain chain) throws IOException, ServletException {
         if (PortletUtil.isPortletRequest(request)) {
+            PortletRequest portletRequest = PortletUtil
+                    .getPortletRequest(request);
             if (PortletUtil.isSAStrutsStarted(request)
-                    && request.getAttribute(DONE) == null) {
-                request.setAttribute(DONE, Boolean.TRUE);
+                    && portletRequest.getAttribute(DONE) == null) {
+                portletRequest.setAttribute(DONE, Boolean.TRUE);
                 // processActionConfig
-                ProcessActionConfig processActionConfig = (ProcessActionConfig) request
+                ProcessActionConfig processActionConfig = (ProcessActionConfig) portletRequest
                         .getAttribute(PortletUtil.PROCESS_ACTION_CONFIG);
                 HttpServletRequest httpServletRequest = (HttpServletRequest) request;
                 HttpServletResponse httpServletResponse = (HttpServletResponse) response;
                 SAStrutsRenderRequest saStrutsRequest = new SAStrutsRenderRequest(
-                        httpServletRequest, processActionConfig);
+                        httpServletRequest, servletContext, processActionConfig);
                 SAStrutsRenderResponse saStrutsResponse = new SAStrutsRenderResponse(
                         httpServletRequest, httpServletResponse, servletContext);
                 // chain
                 chain.doFilter(saStrutsRequest, saStrutsResponse);
                 // set content
-                request.setAttribute(PortletUtil.CONTENT_TYPE, response
+                portletRequest.setAttribute(PortletUtil.CONTENT_TYPE, response
                         .getContentType());
-                request.setAttribute(PortletUtil.PORTLET_CONTENT, getContent(
-                        saStrutsResponse.getTemporaryOutputStream(),
-                        processActionConfig.getCharacterEncoding()));
+                portletRequest
+                        .setAttribute(PortletUtil.PORTLET_CONTENT,
+                                getContent(saStrutsResponse
+                                        .getTemporaryOutputStream()));
             } else {
                 chain.doFilter(request, response);
             }
@@ -108,13 +111,8 @@ public class PortletRequestFilter implements Filter {
         }
     }
 
-    protected String getContent(TemporaryOutputStream tos, String encoding) {
-        String content;
-        try {
-            content = tos.toString(encoding);
-        } catch (UnsupportedEncodingException e) {
-            content = tos.toString();
-        }
+    protected String getContent(TemporaryOutputStream tos) {
+        String content = tos.toString();
 
         if (contentOnly) {
             int bodyBeginIdx = content.indexOf("<body");

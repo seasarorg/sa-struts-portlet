@@ -5,7 +5,7 @@
   <artifactId>sa-struts-portlet</artifactId>
   <packaging>jar</packaging>
   <name>sa-struts-portlet</name>
-  <version>1.0.0-rc2</version>
+  <version>1.0.0-rc3</version>
   <description/>
   <url>http://sastruts.seasar.org/</url>
   <inceptionYear>2004-2008</inceptionYear>

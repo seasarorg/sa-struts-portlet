@@ -20,8 +20,11 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.portlet.PortletRequest;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpSession;
 
 import org.seasar.struts.portlet.config.ProcessActionConfig;
 import org.seasar.struts.portlet.util.PortletUtil;
@@ -46,9 +49,17 @@ public class SAStrutsRenderRequest extends HttpServletRequestWrapper implements
 
     private String charsetEncoding;
 
+    private PortletRequest portletRequest;
+
+    private HttpSession httpSession;
+
+    private ServletContext servletContext;
+
     public SAStrutsRenderRequest(HttpServletRequest request,
-            ProcessActionConfig config) {
+            ServletContext servletContext, ProcessActionConfig config) {
         super(request);
+        this.servletContext = servletContext;
+        portletRequest = PortletUtil.getPortletRequest(request);
         processActionConfig = config;
         pathInfo = processActionConfig.getPathInfo() == null ? null : String
                 .valueOf(processActionConfig.getPathInfo());
@@ -65,11 +76,19 @@ public class SAStrutsRenderRequest extends HttpServletRequestWrapper implements
         for (Iterator itr = processActionConfig.getAttributeMap().entrySet()
                 .iterator(); itr.hasNext();) {
             Map.Entry entry = (Map.Entry) itr.next();
-            request.setAttribute((String) entry.getKey(), entry.getValue());
+            portletRequest.setAttribute((String) entry.getKey(), entry
+                    .getValue());
         }
         if (processActionConfig.getForwardPath() != null) {
-            request.setAttribute(PortletUtil.FORWARD_PATH, processActionConfig
-                    .getForwardPath());
+            portletRequest.setAttribute(PortletUtil.FORWARD_PATH,
+                    processActionConfig.getForwardPath());
+        }
+
+        if (request.isRequestedSessionIdValid()) {
+            this.httpSession = new SAStrutsSession(portletRequest
+                    .getPortletSession(), servletContext);
+        } else {
+            this.httpSession = null;
         }
     }
 
@@ -236,4 +255,41 @@ public class SAStrutsRenderRequest extends HttpServletRequestWrapper implements
         this.charsetEncoding = enc;
     }
 
+    @Override
+    public Object getAttribute(String name) {
+        return portletRequest.getAttribute(name);
+    }
+
+    @Override
+    public Enumeration getAttributeNames() {
+        return portletRequest.getAttributeNames();
+    }
+
+    @Override
+    public void removeAttribute(String name) {
+        portletRequest.removeAttribute(name);
+    }
+
+    @Override
+    public void setAttribute(String name, Object o) {
+        portletRequest.setAttribute(name, o);
+    }
+
+    @Override
+    public HttpSession getSession() {
+        if (httpSession == null) {
+            httpSession = new SAStrutsSession(portletRequest
+                    .getPortletSession(), servletContext);
+        }
+        return httpSession;
+    }
+
+    @Override
+    public HttpSession getSession(boolean create) {
+        if (create) {
+            httpSession = new SAStrutsSession(portletRequest
+                    .getPortletSession(), servletContext);
+        }
+        return httpSession;
+    }
 }

@@ -46,13 +46,11 @@ public class SAStrutsSession implements HttpSession {
     }
 
     public Object getAttribute(String arg0) {
-        return portletSession.getAttribute(arg0,
-                PortletSession.APPLICATION_SCOPE);
+        return portletSession.getAttribute(arg0, PortletSession.PORTLET_SCOPE);
     }
 
     public Enumeration getAttributeNames() {
-        return portletSession
-                .getAttributeNames(PortletSession.APPLICATION_SCOPE);
+        return portletSession.getAttributeNames(PortletSession.PORTLET_SCOPE);
     }
 
     public Enumeration getAttributeNames(int arg0) {
@@ -92,7 +90,7 @@ public class SAStrutsSession implements HttpSession {
     }
 
     public void removeAttribute(String arg0) {
-        portletSession.removeAttribute(arg0, PortletSession.APPLICATION_SCOPE);
+        portletSession.removeAttribute(arg0, PortletSession.PORTLET_SCOPE);
     }
 
     public void setAttribute(String arg0, Object arg1, int arg2) {
@@ -100,8 +98,7 @@ public class SAStrutsSession implements HttpSession {
     }
 
     public void setAttribute(String arg0, Object arg1) {
-        portletSession.setAttribute(arg0, arg1,
-                PortletSession.APPLICATION_SCOPE);
+        portletSession.setAttribute(arg0, arg1, PortletSession.PORTLET_SCOPE);
     }
 
     public void setMaxInactiveInterval(int arg0) {
