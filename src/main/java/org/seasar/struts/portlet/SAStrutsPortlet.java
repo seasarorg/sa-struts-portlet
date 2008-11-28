@@ -105,26 +105,24 @@ public class SAStrutsPortlet extends GenericPortlet {
         encoding = getCharacterEncoding();
 
         saStrutsConfig = new SAStrutsConfig(getPortletConfig());
-        saStrutsFilterChain = createFilterChain(createActionServlet());
     }
 
     protected SAStrutsFilterChain createFilterChain(Servlet servlet) {
-        SAStrutsFilterChain saStrutsFilterChain = new SAStrutsFilterChain(
-                servlet);
+        SAStrutsFilterChain filterChain = new SAStrutsFilterChain(servlet);
 
         // S2ContainerFilter
         Filter s2ContainerFilter = new S2ContainerFilter();
-        saStrutsFilterChain.addFilter(s2ContainerFilter);
+        filterChain.addFilter(s2ContainerFilter);
 
         // HotdeployFilter
         Filter hotdeployFilter = new HotdeployFilter();
-        saStrutsFilterChain.addFilter(hotdeployFilter);
+        filterChain.addFilter(hotdeployFilter);
 
         // RoutingFilter
         Filter routingFilter = new PortletRoutingFilter();
-        saStrutsFilterChain.addFilter(routingFilter);
+        filterChain.addFilter(routingFilter);
 
-        return saStrutsFilterChain;
+        return filterChain;
 
     }
 
@@ -168,7 +166,7 @@ public class SAStrutsPortlet extends GenericPortlet {
     }
 
     protected int getMaxCacheSize() {
-        int size = 10;
+        int size = 5;
         String value = getPortletConfig().getInitParameter(MAX_CACHE_SIZE);
         if (value != null) {
             try {
@@ -202,65 +200,77 @@ public class SAStrutsPortlet extends GenericPortlet {
             throws PortletException, IOException {
         PortletUtil.setSAStrutsStarted(request);
 
-        String requestPath = request.getParameter(PortletUtil.REQUEST_URL);
-        if (requestPath == null) {
-            // nothing
-            return;
-        }
-        Integer accessId = getAccessId(request);
-        if (getProcessActionConfig(request, accessId) != null) {
-            // use cache
-            return;
-        }
-
-        request.setAttribute(PortletUtil.PORTLET_REQUEST, request);
-        request.setAttribute(PortletUtil.PORTLET_RESPONSE, response);
-        request.setAttribute(PortletUtil.PORTLET_CONFIG, getPortletConfig());
-
-        ProcessActionConfig processActionConfig = new ProcessActionConfig(
-                requestPath, request.getContextPath(), encoding);
-
-        Map parameterMap = new HashMap();
-        parameterMap.putAll(request.getParameterMap());
-        processActionConfig.setParameterMap(parameterMap);
-        SAStrutsActionRequest saStrutsActionRequest = new SAStrutsActionRequest(
-                request, saStrutsConfig, processActionConfig);
-        SAStrutsActionResponse saActionResponse = new SAStrutsActionResponse(
-                request, response, getPortletContext());
-
-        // execute
-        process(saStrutsActionRequest, saActionResponse);
-
-        // foward path
-        String forwardPath = (String) request
-                .getAttribute(PortletUtil.FORWARD_PATH);
-        if (forwardPath != null) {
-            processActionConfig.setForwardPath(forwardPath);
-        }
-
-        // error status
-        if (request.getAttribute(PortletUtil.ERROR_STATUS) != null) {
-            processActionConfig.getAttributeMap().put(PortletUtil.ERROR_STATUS,
-                    request.getAttribute(PortletUtil.ERROR_STATUS));
-            Object msg = request.getAttribute(PortletUtil.ERROR_MESSAGE);
-            if (msg != null) {
-                processActionConfig.getAttributeMap().put(
-                        PortletUtil.ERROR_MESSAGE, msg);
+        try {
+            String requestPath = request.getParameter(PortletUtil.REQUEST_URL);
+            if (requestPath == null) {
+                // nothing
+                return;
             }
-        }
+            Integer accessId = getAccessId(request);
+            if (getProcessActionConfig(request, accessId) != null) {
+                // use cache
+                return;
+            }
 
-        // set processActionConfig
-        putProcessActionConfig(request, accessId, processActionConfig);
+            request.setAttribute(PortletUtil.PORTLET_REQUEST, request);
+            request.setAttribute(PortletUtil.PORTLET_RESPONSE, response);
+            request
+                    .setAttribute(PortletUtil.PORTLET_CONFIG,
+                            getPortletConfig());
 
-        if (request.getAttribute(PortletUtil.REDIRECT) == null) {
-            // set accessId
-            response.setRenderParameter(PortletUtil.ACCESS_ID, accessId
-                    .toString());
+            ProcessActionConfig processActionConfig = new ProcessActionConfig(
+                    requestPath, request.getContextPath(), encoding);
+
+            Map parameterMap = new HashMap();
+            parameterMap.putAll(request.getParameterMap());
+            processActionConfig.setParameterMap(parameterMap);
+            SAStrutsActionRequest saStrutsActionRequest = new SAStrutsActionRequest(
+                    request, saStrutsConfig, processActionConfig);
+            SAStrutsActionResponse saActionResponse = new SAStrutsActionResponse(
+                    request, response, getPortletContext());
+
+            // execute
+            process(saStrutsActionRequest, saActionResponse);
+
+            // foward path
+            String forwardPath = (String) request
+                    .getAttribute(PortletUtil.FORWARD_PATH);
+            if (forwardPath != null) {
+                processActionConfig.setForwardPath(forwardPath);
+            }
+
+            // error status
+            if (request.getAttribute(PortletUtil.ERROR_STATUS) != null) {
+                processActionConfig.getAttributeMap().put(
+                        PortletUtil.ERROR_STATUS,
+                        request.getAttribute(PortletUtil.ERROR_STATUS));
+                Object msg = request.getAttribute(PortletUtil.ERROR_MESSAGE);
+                if (msg != null) {
+                    processActionConfig.getAttributeMap().put(
+                            PortletUtil.ERROR_MESSAGE, msg);
+                }
+            }
+
+            // set processActionConfig
+            putProcessActionConfig(request, accessId, processActionConfig);
+
+            if (request.getAttribute(PortletUtil.REDIRECT) == null) {
+                // set accessId
+                response.setRenderParameter(PortletUtil.ACCESS_ID, accessId
+                        .toString());
+            }
+
+        } finally {
+            PortletUtil.setSAStrutsFinished(request);
         }
     }
 
     protected void process(HttpServletRequest request,
             HttpServletResponse response) throws IOException, PortletException {
+        if (saStrutsFilterChain == null) {
+            saStrutsFilterChain = createFilterChain(createActionServlet());
+        }
+
         saStrutsFilterChain.reset();
         try {
             saStrutsFilterChain.doFilter(request, response);
@@ -272,53 +282,59 @@ public class SAStrutsPortlet extends GenericPortlet {
     protected void renderRequest(RenderRequest request,
             RenderResponse response, String defaultPage)
             throws PortletException, IOException {
+
         PortletUtil.setSAStrutsStarted(request);
 
-        Integer accessId = getAccessId(request);
-        ProcessActionConfig processActionConfig = createProcessActionConfig(
-                request, accessId, defaultPage, request.getContextPath());
-        request.setAttribute(PortletUtil.PROCESS_ACTION_CONFIG,
-                processActionConfig);
+        try {
+            Integer accessId = getAccessId(request);
+            ProcessActionConfig processActionConfig = createProcessActionConfig(
+                    request, accessId, defaultPage, request.getContextPath());
+            request.setAttribute(PortletUtil.PROCESS_ACTION_CONFIG,
+                    processActionConfig);
 
-        // check error from processAction
-        Integer sc = (Integer) processActionConfig.getAttributeMap().get(
-                PortletUtil.ERROR_STATUS);
-        if (sc != null) {
-            response.setContentType("text/html");
-            sendError(response, sc, (String) processActionConfig
-                    .getAttributeMap().get(PortletUtil.ERROR_MESSAGE));
-            return;
-        }
-
-        String requestPath = getRequestPath(request); // without contextPath
-
-        PortletRequestDispatcher portletRequestDispatcher = getPortletContext()
-                .getRequestDispatcher(requestPath);
-        portletRequestDispatcher.include(request, response);
-
-        String cType = (String) request.getAttribute(PortletUtil.CONTENT_TYPE);
-        if (cType == null) {
-            cType = contentType;
-            if (cType == null) {
-                cType = "text/html";
+            // check error from processAction
+            Integer sc = (Integer) processActionConfig.getAttributeMap().get(
+                    PortletUtil.ERROR_STATUS);
+            if (sc != null) {
+                response.setContentType("text/html");
+                sendError(response, sc, (String) processActionConfig
+                        .getAttributeMap().get(PortletUtil.ERROR_MESSAGE));
+                return;
             }
-        }
-        response.setContentType(cType);
 
-        sc = (Integer) request.getAttribute(PortletUtil.ERROR_STATUS);
-        if (sc != null) {
-            sendError(response, sc, (String) request
-                    .getAttribute(PortletUtil.ERROR_MESSAGE));
-        } else {
-            response.getWriter().print(
-                    request.getAttribute(PortletUtil.PORTLET_CONTENT));
-            response.flushBuffer();
-        }
+            String requestPath = getRequestPath(request); // without contextPath
 
-        // update processActionConfig
-        putProcessActionConfig(request, PortletUtil.getAccessId(request),
-                processActionConfig);
-        PortletUtil.incrementAccessId(request);
+            PortletRequestDispatcher portletRequestDispatcher = getPortletContext()
+                    .getRequestDispatcher(requestPath);
+            portletRequestDispatcher.include(request, response);
+
+            String cType = (String) request
+                    .getAttribute(PortletUtil.CONTENT_TYPE);
+            if (cType == null) {
+                cType = contentType;
+                if (cType == null) {
+                    cType = "text/html";
+                }
+            }
+            response.setContentType(cType);
+
+            sc = (Integer) request.getAttribute(PortletUtil.ERROR_STATUS);
+            if (sc != null) {
+                sendError(response, sc, (String) request
+                        .getAttribute(PortletUtil.ERROR_MESSAGE));
+            } else {
+                response.getWriter().print(
+                        request.getAttribute(PortletUtil.PORTLET_CONTENT));
+                response.flushBuffer();
+            }
+
+            // update processActionConfig
+            putProcessActionConfig(request, PortletUtil.getAccessId(request),
+                    processActionConfig);
+            PortletUtil.incrementAccessId(request);
+        } finally {
+            PortletUtil.setSAStrutsFinished(request);
+        }
     }
 
     protected void sendError(RenderResponse response, Integer sc, String msg)

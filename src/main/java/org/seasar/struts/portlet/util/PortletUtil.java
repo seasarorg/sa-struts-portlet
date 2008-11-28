@@ -130,6 +130,10 @@ public class PortletUtil {
         request.setAttribute(SASTRUTS_STARTED, Boolean.TRUE);
     }
 
+    public static void setSAStrutsFinished(PortletRequest request) {
+        request.removeAttribute(SASTRUTS_STARTED);
+    }
+
     public static void incrementAccessId(PortletRequest request) {
         PortletSession portletSession = request.getPortletSession();
         Integer accessId = (Integer) portletSession.getAttribute(ACCESS_ID);
