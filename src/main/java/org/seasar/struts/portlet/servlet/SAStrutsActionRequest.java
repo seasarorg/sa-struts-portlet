@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
@@ -294,8 +295,8 @@ public class SAStrutsActionRequest implements HttpServletRequest,
     }
 
     public Enumeration getHeaderNames() {
-        // TODO Auto-generated method stub
-        return null;
+        // return empty
+        return new Enumerator(Collections.EMPTY_LIST.iterator());
     }
 
     public Enumeration getHeaders(String s) {
