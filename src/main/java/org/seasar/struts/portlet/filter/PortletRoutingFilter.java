@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008 the Seasar Foundation and the Others.
+ * Copyright 2004-2009 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,11 +32,16 @@ import org.seasar.struts.portlet.servlet.SAStrutsRequest;
 import org.seasar.struts.portlet.util.PortletUtil;
 
 /**
+ * This class is RoutingFilter for a portlet environment.
+ * 
  * @author shinsuke
  * 
  */
 public class PortletRoutingFilter extends RoutingFilter {
-    protected static final String DONE = "org.seasar.struts.portlet.filter.PortletRoutingFilter.done";
+    /**
+     * a key to check if this filter is already used.
+     */
+    public static final String DONE = "org.seasar.struts.portlet.filter.PortletRoutingFilter.DONE";
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response,
@@ -60,6 +65,7 @@ public class PortletRoutingFilter extends RoutingFilter {
         }
     }
 
+    @Override
     protected void forward(HttpServletRequest request,
             HttpServletResponse response, String actionPath, String paramPath,
             S2ExecuteConfig executeConfig) throws IOException, ServletException {

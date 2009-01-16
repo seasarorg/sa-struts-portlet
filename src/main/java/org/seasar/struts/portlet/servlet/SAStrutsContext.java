@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008 the Seasar Foundation and the Others.
+ * Copyright 2004-2009 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
 /**
+ * SAStrutsContext emulates ServletContext on a portlet environment.
+ * 
  * @author shinsuke
  * 
  */
@@ -35,6 +37,11 @@ public class SAStrutsContext implements ServletContext {
 
     private PortletContext portletContext;
 
+    /**
+     * Defines a servlet context with portlet info.
+     * 
+     * @param portletContext
+     */
     public SAStrutsContext(PortletContext portletContext) {
         this.portletContext = portletContext;
     }
@@ -121,7 +128,7 @@ public class SAStrutsContext implements ServletContext {
      * @see javax.servlet.ServletContext#getContext(java.lang.String)
      */
     public ServletContext getContext(String s) {
-        // TODO Auto-generated method stub
+        // nothing..
         return null;
     }
 
@@ -131,7 +138,7 @@ public class SAStrutsContext implements ServletContext {
      * @see javax.servlet.ServletContext#getServlet(java.lang.String)
      */
     public Servlet getServlet(String s) throws ServletException {
-        // TODO Auto-generated method stub
+        // nothing..
         return null;
     }
 
@@ -141,7 +148,7 @@ public class SAStrutsContext implements ServletContext {
      * @see javax.servlet.ServletContext#getServletContextName()
      */
     public String getServletContextName() {
-        // TODO Auto-generated method stub
+        // nothing..
         return null;
     }
 
@@ -151,7 +158,7 @@ public class SAStrutsContext implements ServletContext {
      * @see javax.servlet.ServletContext#getServletNames()
      */
     public Enumeration getServletNames() {
-        // TODO Auto-generated method stub
+        // nothing..
         return null;
     }
 
@@ -161,7 +168,7 @@ public class SAStrutsContext implements ServletContext {
      * @see javax.servlet.ServletContext#getServlets()
      */
     public Enumeration getServlets() {
-        // TODO Auto-generated method stub
+        // nothing..
         return null;
     }
 
@@ -181,7 +188,7 @@ public class SAStrutsContext implements ServletContext {
      * @see javax.servlet.ServletContext#getNamedDispatcher(java.lang.String)
      */
     public RequestDispatcher getNamedDispatcher(String s) {
-        // TODO Auto-generated method stub
+        // nothing..
         return null;
     }
 
@@ -191,7 +198,7 @@ public class SAStrutsContext implements ServletContext {
      * @see javax.servlet.ServletContext#getRequestDispatcher(java.lang.String)
      */
     public RequestDispatcher getRequestDispatcher(String s) {
-        // TODO Auto-generated method stub
+        // nothing..
         return null;
     }
 

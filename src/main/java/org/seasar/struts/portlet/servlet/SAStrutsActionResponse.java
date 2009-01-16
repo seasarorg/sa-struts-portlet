@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008 the Seasar Foundation and the Others.
+ * Copyright 2004-2009 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.seasar.struts.portlet.util.PortletUtil;
 
 /**
+ * SAStrutsActionResponse emulates HttpServletResponse on a portlet environment.
+ * This class is used on a processAction phase.
+ * 
  * @author shinsuke
  * 
  */
@@ -89,27 +92,27 @@ public class SAStrutsActionResponse implements HttpServletResponse,
     }
 
     public void addCookie(Cookie cookie) {
-        // TODO Auto-generated method stub
+        // nothing..
 
     }
 
     public void addDateHeader(String s, long l) {
-        // TODO Auto-generated method stub
+        // nothing..
 
     }
 
     public void addHeader(String s, String s1) {
-        // TODO Auto-generated method stub
+        // nothing..
 
     }
 
     public void addIntHeader(String s, int i) {
-        // TODO Auto-generated method stub
+        // nothing..
 
     }
 
     public boolean containsHeader(String s) {
-        // TODO Auto-generated method stub
+        // nothing..
         return false;
     }
 
@@ -142,102 +145,102 @@ public class SAStrutsActionResponse implements HttpServletResponse,
     }
 
     public void setDateHeader(String s, long l) {
-        // TODO Auto-generated method stub
+        // nothing..
 
     }
 
     public void setHeader(String s, String s1) {
-        // TODO Auto-generated method stub
+        // nothing..
 
     }
 
     public void setIntHeader(String s, int i) {
-        // TODO Auto-generated method stub
+        // nothing..
 
     }
 
     public void setStatus(int i, String s) {
-        // TODO Auto-generated method stub
+        // nothing..
 
     }
 
     public void setStatus(int i) {
-        // TODO Auto-generated method stub
+        // nothing..
 
     }
 
     public void flushBuffer() throws IOException {
-        // TODO Auto-generated method stub
+        // nothing..
 
     }
 
     public int getBufferSize() {
-        // TODO Auto-generated method stub
+        // nothing..
         return 0;
     }
 
     public String getCharacterEncoding() {
-        // TODO Auto-generated method stub
+        // nothing..
         return null;
     }
 
     public String getContentType() {
-        // TODO Auto-generated method stub
+        // nothing..
         return null;
     }
 
     public Locale getLocale() {
-        // TODO Auto-generated method stub
+        // nothing..
         return null;
     }
 
     public ServletOutputStream getOutputStream() throws IOException {
-        // TODO Auto-generated method stub
+        // nothing..
         return null;
     }
 
     public PrintWriter getWriter() throws IOException {
-        // TODO Auto-generated method stub
+        // nothing..
         return null;
     }
 
     public boolean isCommitted() {
-        // TODO Auto-generated method stub
+        // nothing..
         return false;
     }
 
     public void reset() {
-        // TODO Auto-generated method stub
+        // nothing..
 
     }
 
     public void resetBuffer() {
-        // TODO Auto-generated method stub
+        // nothing..
 
     }
 
     public void setBufferSize(int i) {
-        // TODO Auto-generated method stub
+        // nothing..
 
     }
 
     public void setCharacterEncoding(String s) {
-        // TODO Auto-generated method stub
+        // nothing..
 
     }
 
     public void setContentLength(int i) {
-        // TODO Auto-generated method stub
+        // nothing..
 
     }
 
     public void setContentType(String s) {
-        // TODO Auto-generated method stub
+        // nothing..
 
     }
 
     public void setLocale(Locale locale) {
-        // TODO Auto-generated method stub
+        // nothing..
 
     }
 }

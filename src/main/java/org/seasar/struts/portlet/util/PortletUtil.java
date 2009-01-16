@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008 the Seasar Foundation and the Others.
+ * Copyright 2004-2009 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@ import javax.portlet.RenderResponse;
 import javax.servlet.ServletRequest;
 
 /**
+ * This is a utility class for accessing to a portlet.
+ * 
  * @author shinsuke
  * 
  */
@@ -134,7 +136,7 @@ public class PortletUtil {
         request.removeAttribute(SASTRUTS_STARTED);
     }
 
-    public static void incrementAccessId(PortletRequest request) {
+    public static Integer incrementAccessId(PortletRequest request) {
         PortletSession portletSession = request.getPortletSession();
         Integer accessId = (Integer) portletSession.getAttribute(ACCESS_ID);
         if (accessId == null) {
@@ -143,6 +145,7 @@ public class PortletUtil {
             accessId = Integer.valueOf(accessId.intValue() + 1);
         }
         portletSession.setAttribute(ACCESS_ID, accessId);
+        return accessId;
     }
 
     public static Integer getAccessId(PortletRequest request) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008 the Seasar Foundation and the Others.
+ * Copyright 2004-2009 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,9 @@ import javax.servlet.http.HttpServletResponseWrapper;
 import org.seasar.struts.portlet.util.PortletUtil;
 
 /**
+ * SAStrutsRenderResponse emulates HttpServletResponse on a portlet environment.
+ * This class is used on a render phase.
+ * 
  * @author shinsuke
  * 
  */
@@ -42,6 +45,13 @@ public class SAStrutsRenderResponse extends HttpServletResponseWrapper
 
     private ServletContext servletContext;
 
+    /**
+     * Defines a servlet response with portlet info.
+     * 
+     * @param request
+     * @param response
+     * @param servletContext
+     */
     public SAStrutsRenderResponse(HttpServletRequest request,
             HttpServletResponse response, ServletContext servletContext) {
         super(response);
@@ -50,6 +60,11 @@ public class SAStrutsRenderResponse extends HttpServletResponseWrapper
         this.servletContext = servletContext;
     }
 
+    /**
+     * Returns a temporary output stream.
+     * 
+     * @return
+     */
     public TemporaryOutputStream getTemporaryOutputStream() {
         return tos;
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008 the Seasar Foundation and the Others.
+ * Copyright 2004-2009 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,9 @@ import org.seasar.struts.portlet.config.ProcessActionConfig;
 import org.seasar.struts.portlet.util.PortletUtil;
 
 /**
+ * SAStrutsActionRequest emulates HttpServletRequest on a portlet environment.
+ * This class is used on a processAction phase.
+ * 
  * @author shinsuke
  * 
  */
@@ -57,6 +60,13 @@ public class SAStrutsActionRequest implements HttpServletRequest,
 
     private HttpSession httpSession;
 
+    /**
+     * Defines a servlet config with portlet info.
+     * 
+     * @param actionRequest
+     * @param servletConfig
+     * @param processActionConfig
+     */
     public SAStrutsActionRequest(ActionRequest actionRequest,
             ServletConfig servletConfig, ProcessActionConfig processActionConfig) {
         this.actionRequest = actionRequest;
@@ -91,7 +101,7 @@ public class SAStrutsActionRequest implements HttpServletRequest,
 
     public Enumeration getAttributeNames() {
         List names = new ArrayList();
-        names.add(processActionConfig.getAttributeMap().keySet());
+        names.addAll(processActionConfig.getAttributeMap().keySet());
         for (Enumeration e = actionRequest.getAttributeNames(); e
                 .hasMoreElements();) {
             names.add(e.nextElement());
@@ -280,17 +290,17 @@ public class SAStrutsActionRequest implements HttpServletRequest,
     }
 
     public Cookie[] getCookies() {
-        // TODO Auto-generated method stub
+        // nothing..
         return null;
     }
 
     public long getDateHeader(String s) {
-        // TODO Auto-generated method stub
+        // nothing..
         return 0;
     }
 
     public String getHeader(String s) {
-        // TODO Auto-generated method stub
+        // nothing..
         return null;
     }
 
@@ -300,12 +310,12 @@ public class SAStrutsActionRequest implements HttpServletRequest,
     }
 
     public Enumeration getHeaders(String s) {
-        // TODO Auto-generated method stub
+        // nothing..
         return null;
     }
 
     public int getIntHeader(String s) {
-        // TODO Auto-generated method stub
+        // nothing..
         return 0;
     }
 
@@ -318,7 +328,7 @@ public class SAStrutsActionRequest implements HttpServletRequest,
     }
 
     public String getPathTranslated() {
-        // TODO Auto-generated method stub
+        // nothing..
         return null;
     }
 
@@ -327,12 +337,12 @@ public class SAStrutsActionRequest implements HttpServletRequest,
     }
 
     public String getRequestURI() {
-        // TODO Auto-generated method stub
+        // nothing..
         return null;
     }
 
     public StringBuffer getRequestURL() {
-        // TODO Auto-generated method stub
+        // nothing..
         return null;
     }
 
@@ -359,17 +369,17 @@ public class SAStrutsActionRequest implements HttpServletRequest,
     }
 
     public boolean isRequestedSessionIdFromCookie() {
-        // TODO Auto-generated method stub
+        // nothing..
         return false;
     }
 
     public boolean isRequestedSessionIdFromUrl() {
-        // TODO Auto-generated method stub
+        // nothing..
         return false;
     }
 
     public boolean isRequestedSessionIdFromURL() {
-        // TODO Auto-generated method stub
+        // nothing..
         return false;
     }
 
@@ -378,22 +388,22 @@ public class SAStrutsActionRequest implements HttpServletRequest,
     }
 
     public String getLocalAddr() {
-        // TODO Auto-generated method stub
+        // nothing..
         return null;
     }
 
     public String getLocalName() {
-        // TODO Auto-generated method stub
+        // nothing..
         return null;
     }
 
     public int getLocalPort() {
-        // TODO Auto-generated method stub
+        // nothing..
         return 0;
     }
 
     public String getProtocol() {
-        // TODO Auto-generated method stub
+        // nothing..
         return null;
     }
 
@@ -402,22 +412,22 @@ public class SAStrutsActionRequest implements HttpServletRequest,
     }
 
     public String getRemoteAddr() {
-        // TODO Auto-generated method stub
+        // nothing..
         return null;
     }
 
     public String getRemoteHost() {
-        // TODO Auto-generated method stub
+        // nothing..
         return null;
     }
 
     public int getRemotePort() {
-        // TODO Auto-generated method stub
+        // nothing..
         return 0;
     }
 
     public RequestDispatcher getRequestDispatcher(String s) {
-        // TODO Auto-generated method stub
+        // nothing..
         return null;
     }
 

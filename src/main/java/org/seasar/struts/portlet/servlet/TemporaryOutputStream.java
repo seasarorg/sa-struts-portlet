@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008 the Seasar Foundation and the Others.
+ * Copyright 2004-2009 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@ import java.io.UnsupportedEncodingException;
 import javax.servlet.ServletOutputStream;
 
 /**
+ * TemporaryOutputStream caches an output stream for a response.
+ * 
  * @author shinsuke
  * 
  */
@@ -31,11 +33,19 @@ public class TemporaryOutputStream extends ServletOutputStream {
 
     private boolean close = false;
 
+    /**
+     * Defines a temporary output stream with a buffer size.
+     * 
+     * @param size
+     */
     public TemporaryOutputStream(int size) {
         super();
         baos = new ByteArrayOutputStream(size);
     }
 
+    /**
+     * Defines a temporary output stream. A default buffer size is 32.
+     */
     public TemporaryOutputStream() {
         this(32);
     }
@@ -44,19 +54,23 @@ public class TemporaryOutputStream extends ServletOutputStream {
         return close;
     }
 
+    @Override
     public void close() throws IOException {
         baos.close();
         close = true;
     }
 
+    @Override
     public boolean equals(Object obj) {
         return baos.equals(obj);
     }
 
+    @Override
     public void flush() throws IOException {
         baos.flush();
     }
 
+    @Override
     public int hashCode() {
         return baos.hashCode();
     }
@@ -73,6 +87,7 @@ public class TemporaryOutputStream extends ServletOutputStream {
         return baos.toByteArray();
     }
 
+    @Override
     public String toString() {
         return baos.toString();
     }
@@ -85,14 +100,17 @@ public class TemporaryOutputStream extends ServletOutputStream {
         return baos.toString(enc);
     }
 
+    @Override
     public void write(byte[] b, int off, int len) {
         baos.write(b, off, len);
     }
 
+    @Override
     public void write(byte[] b) throws IOException {
         baos.write(b);
     }
 
+    @Override
     public void write(int b) {
         baos.write(b);
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008 the Seasar Foundation and the Others.
+ * Copyright 2004-2009 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
 /**
+ * SAStrutsFilterChain creates an environment for a servlet filter on a portlet.
+ * 
  * @author shinsuke
  * 
  */
@@ -39,6 +41,11 @@ public class SAStrutsFilterChain implements FilterChain {
 
     private int n = 0;
 
+    /**
+     * Defines a servlet filter chain with a servlet.
+     * 
+     * @param servlet
+     */
     public SAStrutsFilterChain(Servlet servlet) {
         this.servlet = servlet;
     }

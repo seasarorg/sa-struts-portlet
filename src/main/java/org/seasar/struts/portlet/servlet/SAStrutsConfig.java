@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008 the Seasar Foundation and the Others.
+ * Copyright 2004-2009 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 
 /**
+ * SAStrutsConfig emulates ServletConfig on a portlet environment.
+ * 
  * @author shinsuke
  * 
  */
@@ -34,6 +36,11 @@ public class SAStrutsConfig implements ServletConfig, PortletConfig {
 
     private PortletConfig portletConfig;
 
+    /**
+     * Defines a servlet config with portlet info.
+     * 
+     * @param portletConfig
+     */
     public SAStrutsConfig(PortletConfig portletConfig) {
         this.portletConfig = portletConfig;
     }

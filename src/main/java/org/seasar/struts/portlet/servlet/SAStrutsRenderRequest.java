@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008 the Seasar Foundation and the Others.
+ * Copyright 2004-2009 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,12 @@ import javax.servlet.http.HttpSession;
 
 import org.seasar.struts.portlet.config.ProcessActionConfig;
 import org.seasar.struts.portlet.util.PortletUtil;
+import org.seasar.struts.portlet.util.ServletUtil;
 
 /**
+ * SAStrutsRenderRequest emulates HttpServletRequest on a portlet environment.
+ * This class is used on a render phase.
+ * 
  * @author shinsuke
  * 
  */
@@ -55,6 +59,13 @@ public class SAStrutsRenderRequest extends HttpServletRequestWrapper implements
 
     private ServletContext servletContext;
 
+    /**
+     * Defines a servlet request with portlet info.
+     * 
+     * @param request
+     * @param servletContext
+     * @param config
+     */
     public SAStrutsRenderRequest(HttpServletRequest request,
             ServletContext servletContext, ProcessActionConfig config) {
         super(request);
@@ -204,6 +215,11 @@ public class SAStrutsRenderRequest extends HttpServletRequestWrapper implements
      */
     public void setQueryString(String queryString) {
         this.queryString = queryString;
+        if (queryString != null) {
+            getParameterMap().putAll(
+                    ServletUtil.parseQueryParameterMap(queryString,
+                            processActionConfig.getCharacterEncoding()));
+        }
     }
 
     /*

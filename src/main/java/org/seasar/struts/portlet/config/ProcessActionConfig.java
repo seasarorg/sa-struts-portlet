@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008 the Seasar Foundation and the Others.
+ * Copyright 2004-2009 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,17 @@
 package org.seasar.struts.portlet.config;
 
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.seasar.framework.util.StringUtil;
+import org.seasar.struts.portlet.util.ServletUtil;
 
 /**
+ * ProcessActionConfig keeps an access information with a request parameter,
+ * attributes, path and the like. Using this class, a request instance is
+ * created.
+ * 
  * @author shinsuke
  * 
  */
@@ -53,6 +56,13 @@ public class ProcessActionConfig implements Serializable {
 
     private transient Map cachedParameterMap;
 
+    /**
+     * Defines a process info with pathes.
+     * 
+     * @param requestUrl
+     * @param contextPath
+     * @param characterEncoding
+     */
     public ProcessActionConfig(String requestUrl, String contextPath,
             String characterEncoding) {
         init(requestUrl, contextPath, characterEncoding);
@@ -177,23 +187,7 @@ public class ProcessActionConfig implements Serializable {
 
     public void parseQueryParameterMap() {
         this.cachedParameterMap = null;
-        this.queryParameterMap = new HashMap();
-        if (queryString == null) {
-            return;
-        }
-
-        String[] pairs = queryString.split("&");
-        for (int i = 0; i < pairs.length; i++) {
-            String[] pair = pairs[i].split("=");
-            if (pair.length == 2) {
-                try {
-                    this.queryParameterMap.put(URLDecoder.decode(pair[0],
-                            characterEncoding), URLDecoder.decode(pair[1],
-                            characterEncoding));
-                } catch (UnsupportedEncodingException e) {
-                    this.queryParameterMap.put(pair[0], pair[1]);
-                }
-            }
-        }
+        this.queryParameterMap = ServletUtil.parseQueryParameterMap(
+                queryString, characterEncoding);
     }
 }

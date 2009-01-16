@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008 the Seasar Foundation and the Others.
+ * Copyright 2004-2009 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,8 @@ import org.seasar.struts.util.ActionUtil;
 import org.seasar.struts.util.RoutingUtil;
 
 /**
+ * S2LinkTag is called by s:link tag. This class returns a link for a portlet.
+ * 
  * @author shinsuke
  * 
  */

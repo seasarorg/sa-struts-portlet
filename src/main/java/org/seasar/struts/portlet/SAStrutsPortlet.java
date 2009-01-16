@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008 the Seasar Foundation and the Others.
+ * Copyright 2004-2009 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,9 @@ import org.seasar.struts.portlet.servlet.SAStrutsFilterChain;
 import org.seasar.struts.portlet.util.PortletUtil;
 
 /**
+ * This is SAStruts Portlet class. SAStrutsPortlet emulates a servlet
+ * environment and passes a portlet request to SAStruts as a servlet request.
+ * 
  * @author shinsuke
  * 
  */
@@ -198,26 +201,41 @@ public class SAStrutsPortlet extends GenericPortlet {
     @Override
     public void processAction(ActionRequest request, ActionResponse response)
             throws PortletException, IOException {
+        String requestPath = request.getParameter(PortletUtil.REQUEST_URL);
+        if (requestPath == null) {
+            // nothing
+            return;
+        }
+        Integer accessId = getAccessId(request);
+        if (getProcessActionConfig(request, accessId) != null) {
+            // use cache
+            return;
+        }
+
+        request.setAttribute(PortletUtil.PORTLET_REQUEST, request);
+        request.setAttribute(PortletUtil.PORTLET_RESPONSE, response);
+        request.setAttribute(PortletUtil.PORTLET_CONFIG, getPortletConfig());
+
+        ProcessActionConfig processActionConfig = null;
+        while (processRequest(request, response, requestPath, accessId)) {
+            request.removeAttribute(PortletRoutingFilter.DONE);
+            request.removeAttribute(PortletUtil.FORWARD_PATH);
+            requestPath = (String) request
+                    .getAttribute(PortletUtil.REQUEST_URL);
+            accessId = PortletUtil.incrementAccessId(request);
+        }
+    }
+
+    protected boolean processRequest(ActionRequest request,
+            ActionResponse response, String requestPath, Integer accessId)
+            throws PortletException, IOException {
+        if (requestPath == null || accessId == null) {
+            return false;
+        }
+
         PortletUtil.setSAStrutsStarted(request);
 
         try {
-            String requestPath = request.getParameter(PortletUtil.REQUEST_URL);
-            if (requestPath == null) {
-                // nothing
-                return;
-            }
-            Integer accessId = getAccessId(request);
-            if (getProcessActionConfig(request, accessId) != null) {
-                // use cache
-                return;
-            }
-
-            request.setAttribute(PortletUtil.PORTLET_REQUEST, request);
-            request.setAttribute(PortletUtil.PORTLET_RESPONSE, response);
-            request
-                    .setAttribute(PortletUtil.PORTLET_CONFIG,
-                            getPortletConfig());
-
             ProcessActionConfig processActionConfig = new ProcessActionConfig(
                     requestPath, request.getContextPath(), encoding);
 
@@ -237,6 +255,8 @@ public class SAStrutsPortlet extends GenericPortlet {
                     .getAttribute(PortletUtil.FORWARD_PATH);
             if (forwardPath != null) {
                 processActionConfig.setForwardPath(forwardPath);
+            } else {
+                forwardPath = processActionConfig.getForwardPath();
             }
 
             // error status
@@ -254,12 +274,33 @@ public class SAStrutsPortlet extends GenericPortlet {
             // set processActionConfig
             putProcessActionConfig(request, accessId, processActionConfig);
 
-            if (request.getAttribute(PortletUtil.REDIRECT) == null) {
+            if (processActionConfig == null) {
+                return false;
+            }
+
+            if (request.getAttribute(PortletUtil.REDIRECT) != null) {
+                return false;
+            } else {
                 // set accessId
                 response.setRenderParameter(PortletUtil.ACCESS_ID, accessId
                         .toString());
             }
 
+            if (forwardPath == null) {
+                return false;
+            }
+            int idx = forwardPath.indexOf("?");
+            if (idx > 0) {
+                forwardPath = forwardPath.substring(0, idx);
+            }
+            if (forwardPath.endsWith(".do")) {
+                String requestUrl = processActionConfig.getContextPath()
+                        + processActionConfig.getForwardPath();
+                request.setAttribute(PortletUtil.REQUEST_URL, requestUrl
+                        .replaceAll("^/+", "/"));
+                return true;
+            }
+            return false;
         } finally {
             PortletUtil.setSAStrutsFinished(request);
         }
@@ -275,6 +316,7 @@ public class SAStrutsPortlet extends GenericPortlet {
         try {
             saStrutsFilterChain.doFilter(request, response);
         } catch (ServletException e) {
+            e.printStackTrace();
             throw new PortletException(e);
         }
     }

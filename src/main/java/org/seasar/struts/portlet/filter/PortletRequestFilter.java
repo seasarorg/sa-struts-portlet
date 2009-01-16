@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008 the Seasar Foundation and the Others.
+ * Copyright 2004-2009 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,17 +35,29 @@ import org.seasar.struts.portlet.servlet.TemporaryOutputStream;
 import org.seasar.struts.portlet.util.PortletUtil;
 
 /**
+ * This filter constructs a servlet environment on portlet.
+ * 
  * @author shinsuke
  * 
  */
 public class PortletRequestFilter implements Filter {
 
+    /**
+     * a key to check if this filter is already used.
+     */
     protected static final String DONE = "org.seasar.struts.portlet.filter.PortletRequestFilter.done";
 
     private static final String CONTENT_ONLY = "contentOnly";
 
+    /**
+     * Returns a content only if true. If false, returns all content with html,
+     * head, and body tag
+     */
     protected boolean contentOnly;
 
+    /**
+     * a servlet context.
+     */
     protected ServletContext servletContext;
 
     /*
@@ -111,6 +123,12 @@ public class PortletRequestFilter implements Filter {
         }
     }
 
+    /**
+     * Returns a html content.
+     * 
+     * @param tos
+     * @return
+     */
     protected String getContent(TemporaryOutputStream tos) {
         String content = tos.toString();
 
