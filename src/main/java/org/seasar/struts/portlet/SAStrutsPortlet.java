@@ -410,7 +410,7 @@ public class SAStrutsPortlet extends GenericPortlet {
                     .getForwardPath());
         } else if (processActionConfig != null) {
             request.setAttribute(PortletUtil.REQUEST_URL, processActionConfig
-                    .getRequestURL());
+                    .getServletPath());
         } else {
             StringBuilder buf = new StringBuilder();
             if (!StringUtil.isEmpty(contextPath)) {
