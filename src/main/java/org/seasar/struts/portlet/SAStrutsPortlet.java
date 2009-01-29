@@ -206,11 +206,7 @@ public class SAStrutsPortlet extends GenericPortlet {
             // nothing
             return;
         }
-        Integer accessId = getAccessId(request);
-        if (getProcessActionConfig(request, accessId) != null) {
-            // use cache
-            return;
-        }
+        Integer accessId = PortletUtil.getAccessId(request);
 
         request.setAttribute(PortletUtil.PORTLET_REQUEST, request);
         request.setAttribute(PortletUtil.PORTLET_RESPONSE, response);
