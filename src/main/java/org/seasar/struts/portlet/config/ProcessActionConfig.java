@@ -16,6 +16,8 @@
 package org.seasar.struts.portlet.config;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -73,10 +75,19 @@ public class ProcessActionConfig implements Serializable {
         this.contextPath = contextPath;
         int qPos = requestUrl.indexOf("?");
         if (qPos == -1) {
-            requestURI = requestUrl;
+            try {
+                requestURI = URLDecoder.decode(requestUrl, characterEncoding);
+            } catch (UnsupportedEncodingException e) {
+                requestURI = requestUrl;
+            }
             queryString = null;
         } else {
-            requestURI = requestUrl.substring(0, qPos);
+            try {
+                requestURI = URLDecoder.decode(requestUrl.substring(0, qPos),
+                        characterEncoding);
+            } catch (UnsupportedEncodingException e) {
+                requestURI = requestUrl.substring(0, qPos);
+            }
             queryString = requestUrl.substring(qPos + 1);
         }
         if (!StringUtil.isEmpty(contextPath)) {
