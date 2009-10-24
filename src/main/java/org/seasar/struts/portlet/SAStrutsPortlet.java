@@ -312,7 +312,6 @@ public class SAStrutsPortlet extends GenericPortlet {
         try {
             saStrutsFilterChain.doFilter(request, response);
         } catch (ServletException e) {
-            e.printStackTrace();
             throw new PortletException(e);
         }
     }

@@ -70,7 +70,7 @@ public class SAStrutsFilterChain implements FilterChain {
     public void doFilter(ServletRequest request, ServletResponse response)
             throws IOException, ServletException {
         // Call the next filter if there is one
-        int pos = ((Integer) filterPosition.get()).intValue();
+        int pos = filterPosition.get().intValue();
         if (pos < n) {
             Filter filter = filters[pos++];
             filterPosition.set(Integer.valueOf(pos));

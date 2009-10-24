@@ -29,6 +29,7 @@ import org.seasar.struts.config.S2ExecuteConfig;
 import org.seasar.struts.portlet.servlet.SAStrutsActionRequest;
 import org.seasar.struts.portlet.servlet.SAStrutsRequest;
 import org.seasar.struts.portlet.util.PortletUtil;
+import org.seasar.struts.portlet.util.ServletUtil;
 import org.seasar.struts.util.S2ActionMappingUtil;
 import org.seasar.struts.util.S2ExecuteConfigUtil;
 
@@ -93,10 +94,12 @@ public class S2RequestProcessor extends
                 if (PortletUtil.isActionRequest(request)) {
                     if (uri.indexOf(":") == -1) {
                         // set processActionConfig
-                        if (request instanceof SAStrutsActionRequest) {
+                        SAStrutsRequest sRequest = ServletUtil
+                                .unwrapSAStrutsRequest(request);
+                        if (sRequest instanceof SAStrutsActionRequest) {
                             String contextPath = PortletUtil.getActionRequest(
                                     request).getContextPath();
-                            ((SAStrutsActionRequest) request)
+                            ((SAStrutsActionRequest) sRequest)
                                     .getProcessActionConfig().init(
                                             contextPath + uri, contextPath,
                                             request.getCharacterEncoding());
@@ -137,8 +140,8 @@ public class S2RequestProcessor extends
     protected void doForward(String uri, HttpServletRequest request,
             HttpServletResponse response) throws IOException, ServletException {
 
-        if (request instanceof SAStrutsRequest) {
-            SAStrutsRequest sRequest = (SAStrutsRequest) request;
+        SAStrutsRequest sRequest = ServletUtil.unwrapSAStrutsRequest(request);
+        if (sRequest != null) {
             sRequest.setRequestURI(request.getContextPath() + uri);
             int index = uri.indexOf("?");
             String queryString = null;
@@ -165,8 +168,8 @@ public class S2RequestProcessor extends
     protected void doInclude(String uri, HttpServletRequest request,
             HttpServletResponse response) throws IOException, ServletException {
 
-        if (request instanceof SAStrutsRequest) {
-            SAStrutsRequest sRequest = (SAStrutsRequest) request;
+        SAStrutsRequest sRequest = ServletUtil.unwrapSAStrutsRequest(request);
+        if (sRequest != null) {
             sRequest.setRequestURI(request.getContextPath() + uri);
             int index = uri.indexOf("?");
             String queryString = null;

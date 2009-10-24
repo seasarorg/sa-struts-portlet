@@ -30,6 +30,7 @@ import org.seasar.struts.config.S2ExecuteConfig;
 import org.seasar.struts.filter.RoutingFilter;
 import org.seasar.struts.portlet.servlet.SAStrutsRequest;
 import org.seasar.struts.portlet.util.PortletUtil;
+import org.seasar.struts.portlet.util.ServletUtil;
 
 /**
  * This class is RoutingFilter for a portlet environment.
@@ -77,8 +78,8 @@ public class PortletRoutingFilter extends RoutingFilter {
             forwardPath = forwardPath + queryString;
         }
 
-        if (request instanceof SAStrutsRequest) {
-            SAStrutsRequest sRequest = (SAStrutsRequest) request;
+        SAStrutsRequest sRequest = ServletUtil.unwrapSAStrutsRequest(request);
+        if (sRequest != null) {
             sRequest.setContextPath(request.getContextPath());
             sRequest.setRequestURI(request.getContextPath() + forwardPath);
             sRequest.setServletPath(servletPath);

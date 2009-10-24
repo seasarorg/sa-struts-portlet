@@ -20,7 +20,12 @@ import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletRequestWrapper;
+import javax.servlet.http.HttpServletRequestWrapper;
+
 import org.seasar.framework.util.StringUtil;
+import org.seasar.struts.portlet.servlet.SAStrutsRequest;
 
 /**
  * This is a utility class for assessing to a servlet.
@@ -55,5 +60,19 @@ public class ServletUtil {
             }
         }
         return paramMap;
+    }
+
+    public static SAStrutsRequest unwrapSAStrutsRequest(ServletRequest request) {
+        if (request instanceof ServletRequestWrapper) {
+            if (request instanceof SAStrutsRequest) {
+                return (SAStrutsRequest) request;
+            } else {
+                return unwrapSAStrutsRequest(ServletRequestWrapper.class.cast(
+                        request).getRequest());
+            }
+        } else if (request instanceof SAStrutsRequest) {
+            return (SAStrutsRequest) request;
+        }
+        return null;
     }
 }

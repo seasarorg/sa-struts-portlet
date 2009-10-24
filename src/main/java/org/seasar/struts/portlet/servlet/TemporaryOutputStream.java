@@ -62,7 +62,7 @@ public class TemporaryOutputStream extends ServletOutputStream {
 
     @Override
     public boolean equals(Object obj) {
-        return baos.equals(obj);
+        return (this == obj);
     }
 
     @Override

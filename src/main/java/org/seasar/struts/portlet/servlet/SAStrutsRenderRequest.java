@@ -131,7 +131,7 @@ public class SAStrutsRenderRequest extends HttpServletRequestWrapper implements
     public String[] getParameterValues(String name) {
         Object value = getParameterMap().get(name);
         if (value == null)
-            return ((String[]) null);
+            return null;
         else if (value instanceof String[])
             return ((String[]) value);
         else if (value instanceof String) {
