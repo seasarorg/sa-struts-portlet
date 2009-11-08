@@ -273,6 +273,13 @@ public class SAStrutsRenderRequest extends HttpServletRequestWrapper implements
 
     @Override
     public Object getAttribute(String name) {
+        if (PortletUtil.SERVLET_PATH.equals(name)
+                || PortletUtil.CONTEXT_PATH.equals(name)
+                || PortletUtil.REQUEST_URI.equals(name)
+                || PortletUtil.PATH_INFO.equals(name)
+                || PortletUtil.QUERY_STRING.equals(name)) {
+            return null;
+        }
         return portletRequest.getAttribute(name);
     }
 

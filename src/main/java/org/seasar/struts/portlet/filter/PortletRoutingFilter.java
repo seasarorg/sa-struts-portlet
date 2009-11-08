@@ -18,19 +18,25 @@ package org.seasar.struts.portlet.filter;
 import java.io.IOException;
 
 import javax.portlet.PortletRequest;
+import javax.servlet.Filter;
 import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.seasar.framework.container.S2Container;
+import org.seasar.framework.container.factory.SingletonS2ContainerFactory;
 import org.seasar.framework.util.StringUtil;
 import org.seasar.struts.config.S2ExecuteConfig;
-import org.seasar.struts.filter.RoutingFilter;
 import org.seasar.struts.portlet.servlet.SAStrutsRequest;
 import org.seasar.struts.portlet.util.PortletUtil;
 import org.seasar.struts.portlet.util.ServletUtil;
+import org.seasar.struts.util.RequestUtil;
+import org.seasar.struts.util.RoutingUtil;
+import org.seasar.struts.util.S2ExecuteConfigUtil;
 
 /**
  * This class is RoutingFilter for a portlet environment.
@@ -38,13 +44,18 @@ import org.seasar.struts.portlet.util.ServletUtil;
  * @author shinsuke
  * 
  */
-public class PortletRoutingFilter extends RoutingFilter {
+public class PortletRoutingFilter implements Filter {
     /**
      * a key to check if this filter is already used.
      */
     public static final String DONE = "org.seasar.struts.portlet.filter.PortletRoutingFilter.DONE";
 
-    @Override
+    public void init(FilterConfig config) throws ServletException {
+    }
+
+    public void destroy() {
+    }
+
     public void doFilter(ServletRequest request, ServletResponse response,
             FilterChain chain) throws IOException, ServletException {
         if (PortletUtil.isPortletRequest(request)) {
@@ -53,7 +64,7 @@ public class PortletRoutingFilter extends RoutingFilter {
             if (PortletUtil.isSAStrutsStarted(request)
                     && portletRequest.getAttribute(DONE) == null) {
                 portletRequest.setAttribute(DONE, Boolean.TRUE);
-                super.doFilter(request, response, chain);
+                doFilterInternal(request, response, chain);
                 if (PortletUtil.isActionRequest(request)) {
                     chain.doFilter(request, response);
                 }
@@ -66,7 +77,6 @@ public class PortletRoutingFilter extends RoutingFilter {
         }
     }
 
-    @Override
     protected void forward(HttpServletRequest request,
             HttpServletResponse response, String actionPath, String paramPath,
             S2ExecuteConfig executeConfig) throws IOException, ServletException {
@@ -95,5 +105,111 @@ public class PortletRoutingFilter extends RoutingFilter {
             request.getRequestDispatcher(forwardPath)
                     .forward(request, response);
         }
+    }
+
+    protected void doFilterInternal(ServletRequest request,
+            ServletResponse response, FilterChain chain) throws IOException,
+            ServletException {
+        HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletResponse res = (HttpServletResponse) response;
+        String contextPath = req.getContextPath();
+        if (contextPath.equals("/")) {
+            contextPath = "";
+        }
+        String path = RequestUtil.getPath(req);
+        // if (!processDirectAccess(request, response, chain, path)) {
+        // return;
+        // }
+        if (path.indexOf('.') < 0) {
+            String[] names = StringUtil.split(path, "/");
+            S2Container container = SingletonS2ContainerFactory.getContainer();
+            StringBuilder sb = new StringBuilder(50);
+            for (int i = 0; i < names.length; i++) {
+                if (container.hasComponentDef(sb + names[i] + "Action")) {
+                    String actionPath = RoutingUtil.getActionPath(names, i);
+                    String paramPath = RoutingUtil.getParamPath(names, i + 1);
+                    if (StringUtil.isEmpty(paramPath)) {
+                        // if (!path.endsWith("/")) {
+                        // String queryString = "";
+                        // if (req.getQueryString() != null) {
+                        // queryString = "?" + req.getQueryString();
+                        // }
+                        // res.sendRedirect(contextPath + path + "/"
+                        // + queryString);
+                        // return;
+                        // } else
+                        if (S2ExecuteConfigUtil.findExecuteConfig(actionPath,
+                                req) != null) {
+                            forward((HttpServletRequest) request,
+                                    (HttpServletResponse) response, actionPath,
+                                    null, null);
+                            return;
+                        }
+                    } else {
+                        S2ExecuteConfig executeConfig = S2ExecuteConfigUtil
+                                .findExecuteConfig(actionPath, paramPath);
+                        if (executeConfig != null) {
+                            forward((HttpServletRequest) request,
+                                    (HttpServletResponse) response, actionPath,
+                                    paramPath, executeConfig);
+                            return;
+                        }
+                    }
+                }
+                if (container.hasComponentDef(sb + "indexAction")) {
+                    String actionPath = RoutingUtil.getActionPath(names, i - 1)
+                            + "/index";
+                    String paramPath = RoutingUtil.getParamPath(names, i);
+                    if (StringUtil.isEmpty(paramPath)) {
+                        // if (!path.endsWith("/")) {
+                        // String queryString = "";
+                        // if (req.getQueryString() != null) {
+                        // queryString = "?" + req.getQueryString();
+                        // }
+                        // res.sendRedirect(contextPath + path + "/"
+                        // + queryString);
+                        // return;
+                        // } else
+                        if (S2ExecuteConfigUtil.findExecuteConfig(actionPath,
+                                req) != null) {
+                            forward((HttpServletRequest) request,
+                                    (HttpServletResponse) response, actionPath,
+                                    null, null);
+                            return;
+                        }
+                    } else {
+                        S2ExecuteConfig executeConfig = S2ExecuteConfigUtil
+                                .findExecuteConfig(actionPath, paramPath);
+                        if (executeConfig != null) {
+                            forward((HttpServletRequest) request,
+                                    (HttpServletResponse) response, actionPath,
+                                    paramPath, executeConfig);
+                            return;
+                        }
+                    }
+                }
+                sb.append(names[i] + "_");
+            }
+            if (container.hasComponentDef(sb + "indexAction")) {
+                String actionPath = RoutingUtil.getActionPath(names,
+                        names.length - 1)
+                        + "/index";
+                // if (!path.endsWith("/")) {
+                // String queryString = "";
+                // if (req.getQueryString() != null) {
+                // queryString = "?" + req.getQueryString();
+                // }
+                // res.sendRedirect(contextPath + path + "/" + queryString);
+                // return;
+                // } else
+                if (S2ExecuteConfigUtil.findExecuteConfig(actionPath, req) != null) {
+                    forward((HttpServletRequest) request,
+                            (HttpServletResponse) response, actionPath, null,
+                            null);
+                    return;
+                }
+            }
+        }
+        chain.doFilter(request, response);
     }
 }

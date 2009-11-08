@@ -123,7 +123,11 @@ public class PortletUtil {
     public static boolean isSAStrutsStarted(ServletRequest request) {
         PortletRequest portletRequest = getPortletRequest(request);
         if (portletRequest != null) {
-            return portletRequest.getAttribute(SASTRUTS_STARTED) != null;
+            try {
+                return portletRequest.getAttribute(SASTRUTS_STARTED) != null;
+            } catch (Exception e) {
+                // Pluto throws an exception
+            }
         }
         return false;
     }
